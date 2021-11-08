@@ -18,6 +18,10 @@ def time_of_function(function):
 
 @time_of_function
 def task_3_2():
+    """
+        Фильтр скользящих средних (ключевой элемент - крайний слева)
+        N - Ширина окна
+    """
     signal = np.copy(amplitudes)
     N = 50
     for i in range(len(signal)):
@@ -30,13 +34,16 @@ def task_3_2():
 
 @time_of_function
 def task_3():
+    """
+        Фильтр скользящих средних (ключевой элемент - посередине)
+        N - Ширина окна (нечетное число)
+    """
     signal = np.copy(amplitudes)
     N = 21
     step = int((N - 1) / 2) if N % 2 != 0 else int(N / 2)
     for i in range(len(signal)):
         step_left = 0 if i - step < 0 else i - step
-        right_step = len(signal) if i + step > len(signal) else i + step
-        part = signal[step_left: right_step]
+        part = signal[step_left: i + step]
         signal[i] = sum(part) / len(part)
     ax.plot(times, signal, 'g', label="Filtered Signal", linestyle='--')
     ax.legend()
@@ -45,6 +52,11 @@ def task_3():
 
 @time_of_function
 def task_2_2():
+    """
+        Быстрое преобразование Фурье (БПФ) с пакета numpy
+        fft - Прямое БПФ (результат в spectrum)
+        ifft - Обратное БПФ (результат в restored_signal)
+    """
     spectrum = fft(amplitudes)
     freq = np.arange(len(spectrum))
 
@@ -63,6 +75,11 @@ def task_2_2():
 
 @time_of_function
 def task_2():
+    """
+        Дискретное преобразование Фурье (ДПФ)
+        dft - Прямое ДПФ (результат в spectrum)
+        idft - Обратное ДПФ (результат в restored_signal)
+    """
     spectrum = dft(amplitudes)
     freq = np.arange(len(spectrum))
 
@@ -81,6 +98,15 @@ def task_2():
 
 @time_of_function
 def task_1():
+    """
+        Преобразование Фурье (ПФ) двумя способами
+        1. через прямоугольники
+            ft1 - Прямое ПФ (результат в spectrum)
+            ift1 - Обратное ПФ (результат в restored_signal)
+        2. через интеграл
+            ft2 - Прямое ПФ (результат в spectrum)
+            ift2 - Обратное ПФ (результат в restored_signal)
+    """
     omegas = np.arange(1e-3, 50, 1e-3)
 
     # spectrum = ft1(times, amplitudes, omegas)
