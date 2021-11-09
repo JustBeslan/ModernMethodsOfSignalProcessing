@@ -3,40 +3,38 @@ import numpy as np
 
 def ft1(times, amplitudes, omegas):
     delta_t = times[1] - times[0]
-    X = []
-    for omega in omegas:
-        e = np.exp(-1j * omega * times)
-        X.append(np.dot(amplitudes, e) * delta_t)
-    return np.array(X)
+    X = np.zeros((len(omegas),), dtype=np.complex128)
+    for i in range(len(omegas)):
+        X[i] = np.dot(amplitudes, np.exp(-1j * omegas[i] * times))
+    return X * delta_t
 
 
 def ift1(times, spectrum, omegas):
     delta_omega = omegas[1] - omegas[0]
-    x = []
-    for time in times:
-        e = np.exp(1j * omegas * time)
-        x.append(np.dot(spectrum, e).real * delta_omega)
-    return np.array(x) / np.pi
+    x = np.zeros((len(times),))
+    for i in range(len(times)):
+        x[i] = np.dot(spectrum, np.exp(1j * omegas * times[i])).real
+    return x * (delta_omega / np.pi)
 
 
 def ft2(times, amplitudes, omegas):
     delta_t = times[1] - times[0]
-    X = []
-    for omega in omegas:
-        edt = np.exp(1j * omega * delta_t)
-        phi = (np.exp(-1j * omega * times) / (delta_t * omega ** 2)) * (2 - edt - (1 / edt))
-        X.append(np.dot(amplitudes, phi))
-    return np.array(X)
+    X = np.zeros((len(omegas),), dtype=np.complex128)
+    for i in range(len(omegas)):
+        edt = np.exp(1j * omegas[i] * delta_t)
+        k = (2 - edt - (1 / edt)) / (delta_t * omegas[i] ** 2)
+        X[i] = k * np.dot(amplitudes, np.exp(-1j * omegas[i] * times))
+    return X
 
 
 def ift2(times, spectrum, omegas):
     delta_omega = omegas[1] - omegas[0]
-    x = []
-    for time in times:
-        e_d_omega = np.exp(1j * time * delta_omega)
-        psi = (np.exp(1j * time * omegas) / (delta_omega * time ** 2)) * (2 - e_d_omega - (1 / e_d_omega))
-        x.append(np.dot(spectrum, psi).real)
-    return np.array(x) / np.pi
+    x = np.zeros((len(times),))
+    for i in range(len(times)):
+        e_d_omega = np.exp(1j * times[i] * delta_omega)
+        k = (2 - e_d_omega - (1 / e_d_omega)) / (delta_omega * times[i] ** 2)
+        x[i] = (k * np.dot(spectrum, np.exp(1j * times[i] * omegas))).real
+    return x / np.pi
 
 
 def dft(amplitudes):
