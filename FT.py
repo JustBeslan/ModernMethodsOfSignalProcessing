@@ -39,22 +39,22 @@ def ift2(times, spectrum, omegas):
 
 def dft(amplitudes):
     N = len(amplitudes)
-    X = []
+    X = np.zeros((N,), dtype=np.complex128)
     n = np.arange(N)
     for k in range(N):
         e = np.exp(-2j * np.pi * k * n / N)
-        X.append(np.dot(amplitudes, e))
-    return np.array(X)
+        X[k] = np.dot(amplitudes, e)
+    return X
 
 
 def idft(spectrum):
     N = len(spectrum)
-    restored_signal = []
+    restored_signal = np.zeros((N,), dtype=np.complex128)
     k = np.arange(N)
     for n in range(N):
         e = np.exp(2j * np.pi * k * n / N)
-        restored_signal.append(np.dot(spectrum, e))
-    return np.array(restored_signal) / N
+        restored_signal[n] = np.dot(spectrum, e)
+    return restored_signal / N
 
 
 def fft(amplitudes):
