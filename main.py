@@ -46,12 +46,11 @@ def task_3(type_filter):
         """
             Фильтр Низких частот с окном Ханна (Ханнинга)
             signal - Исходный сигнал
-            P - Порядок фильтра
             window - тип оконной функции
         """
         filtered_signal = windows_filters(
             signal=np.copy(amplitudes),
-            P=1,
+            P=5,
             window=type_filter)
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
@@ -59,30 +58,26 @@ def task_3(type_filter):
         """
             Фильтр Низких частот с окном Хэмминга
             signal - Исходный сигнал
-            P - Порядок фильтра
             window - тип оконной функции
             alpha - коэффициент для оконной функции Хэмминга
         """
         filtered_signal = windows_filters(
             signal=np.copy(amplitudes),
-            P=2,
             window=type_filter,
-            alpha=0.5)
+            alpha=0.54)
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
     elif type_filter == 'blackman':
         """
             Фильтр Низких частот с окном Блэкмана
             signal - Исходный сигнал
-            P - Порядок фильтра
             window - тип оконной функции
             alpha - коэффициент для оконной функции Блэкмана
         """
         filtered_signal = windows_filters(
             signal=np.copy(amplitudes),
-            P=1,
             window=type_filter,
-            alpha=0.03)
+            alpha=0.16)
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
     elif type_filter == 'raised_cosine':
@@ -95,7 +90,6 @@ def task_3(type_filter):
         """
         filtered_signal = windows_filters(
             signal=np.copy(amplitudes),
-            P=2,
             window=type_filter,
             alpha=0.5,
             omega0=7)
@@ -104,62 +98,38 @@ def task_3(type_filter):
 
 
 @time_of_function
-def task_2_2():
+def task_2(type_ft):
     """
-        Быстрое преобразование Фурье (БПФ) с пакета numpy
+        Дискретное преобразование Фурье (ДПФ) и Быстрое преобразование Фурье (БПФ) с пакета numpy
+        dft - Прямое ДПФ (результат в spectrum)
         fft - Прямое БПФ (результат в spectrum)
+        idft - Обратное ДПФ (результат в restored_signal)
         ifft - Обратное БПФ (результат в restored_signal)
     """
+
+    N = len(amplitudes)
     delta_t = times[1] - times[0]
-    delta_omega = 2 * np.pi / (len(amplitudes) * delta_t)
-    omegas = np.array([k * delta_omega for k in range(len(amplitudes))])
+    delta_omega = 2 * np.pi / (N * delta_t)
+    omegas = np.array([k * delta_omega for k in range(N)])
 
     start_time = time.perf_counter_ns()
-
-    spectrum = fft(amplitudes)
-    restored_signal = ifft(spectrum)
-
+    if type_ft == 'dft':
+        spectrum = dft(amplitudes)
+        restored_signal = idft(spectrum)
+    else:
+        spectrum = np.fft.fft(amplitudes, norm='ortho')
+        restored_signal = np.fft.ifft(spectrum, norm='ortho')
     print(f"time(ns) == {time.perf_counter_ns() - start_time}")
 
-    # freq = np.arange(len(spectrum))
     ax1 = fig.add_subplot(2, 1, 2)
     ax1.plot(omegas / (2 * np.pi), abs(spectrum), 'b', label="Spectrum")
-    # ax1.stem(freq, abs(spectrum), 'b', markerfmt=" ", basefmt="-b", label="FFT")
-    ax1.set_xlabel('Freq (Hz)')
-    ax1.set_ylabel('DFT Amplitude |X(freq)|')
-
-    ax.plot(times, restored_signal, 'g', label="Restored Signal", linestyle='-')
-
-    ax.legend()
-    ax1.legend()
-
-
-@time_of_function
-def task_2():
-    """
-        Дискретное преобразование Фурье (ДПФ)
-        dft - Прямое ДПФ (результат в spectrum)
-        idft - Обратное ДПФ (результат в restored_signal)
-    """
-    delta_t = times[1] - times[0]
-    delta_omega = 2 * np.pi / (len(amplitudes) * delta_t)
-    omegas = np.array([k * delta_omega for k in range(len(amplitudes))])
-
-    start_time = time.perf_counter_ns()
-
-    spectrum = dft(amplitudes)
-    restored_signal = idft(spectrum)
-
-    print(f"time(ns) == {time.perf_counter_ns() - start_time}")
-
     # freq = np.arange(len(spectrum))
-    ax1 = fig.add_subplot(2, 1, 2)
-    ax1.plot(omegas / (2 * np.pi), abs(spectrum), 'b', label="Spectrum")
+    # ax1.plot(freq, abs(spectrum), 'b', label="Spectrum")
     # ax1.stem(freq, abs(spectrum), 'b', markerfmt=" ", basefmt="-b", label="DFT")
-    ax1.set_xlabel('Freq (Hz)')
-    ax1.set_ylabel('DFT Amplitude |X(freq)|')
+    ax1.set_xlabel('Freq')
+    ax1.set_ylabel('Amplitude')
 
-    ax.plot(times, restored_signal, 'g', label="Restored Signal")
+    ax.plot(times, restored_signal, 'g', label="Restored Signal", linestyle='--')
 
     ax.legend()
     ax1.legend()
@@ -180,27 +150,27 @@ def task_1():
 
     start_time = time.perf_counter_ns()
 
-    spectrum = ft1(times, amplitudes, omegas)
-    restored_signal = ift1(times, spectrum, omegas)
-    # spectrum = ft2(times, amplitudes, omegas)
-    # restored_signal = ift2(times, spectrum, omegas)
+    # spectrum = ft1(times, amplitudes, omegas)
+    # restored_signal = ift1(times, spectrum, omegas)
+    spectrum = ft2(times, amplitudes, omegas)
+    restored_signal = ift2(times, spectrum, omegas)
 
     print(f"time(ns) == {time.perf_counter_ns() - start_time}")
 
     ax1 = fig.add_subplot(2, 1, 2)
     ax1.plot(omegas / (2 * np.pi), abs(spectrum), 'b', label="Spectrum")
-    ax1.set_xlabel('Freq (Hz)')
-    ax1.set_ylabel('FT Amplitude |X(freq)|')
+    ax1.set_xlabel('Freq')
+    ax1.set_ylabel('Amplitude')
 
-    ax.plot(times, restored_signal, 'g', label="Restored Signal")
+    ax.plot(times, restored_signal, 'g', label="Restored Signal", linestyle='--')
 
     ax.legend()
     ax1.legend()
 
 
 def get_data_from_file(filename):
-    start = 6000
-    count = 20000
+    # start = 6000
+    # count = 20000
     if filename[-3:] == 'wav':
         sr, data = wavfile.read(filename)
         length = data.shape[0] / sr
@@ -235,7 +205,6 @@ if __name__ == "__main__":
     ax.set_ylabel('Amplitude')
 
     # task_1()
-    # task_2()
-    # task_2_2()
-    task_3('raised_cosine')
+    # task_2('dft')
+    task_3('hann')
     plt.show()

@@ -44,7 +44,7 @@ def dft(amplitudes):
     for k in range(N):
         e = np.exp(-2j * np.pi * k * n / N)
         X[k] = np.dot(amplitudes, e)
-    return X
+    return X / np.sqrt(N)
 
 
 def idft(spectrum):
@@ -54,12 +54,4 @@ def idft(spectrum):
     for n in range(N):
         e = np.exp(2j * np.pi * k * n / N)
         restored_signal[n] = np.dot(spectrum, e)
-    return restored_signal / N
-
-
-def fft(amplitudes):
-    return np.fft.fft(amplitudes)
-
-
-def ifft(spectr):
-    return np.fft.ifft(spectr)
+    return restored_signal / np.sqrt(N)

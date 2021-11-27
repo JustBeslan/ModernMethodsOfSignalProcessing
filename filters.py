@@ -15,10 +15,10 @@ def moving_average(signal, N, pos_central_elem):
     return signal
 
 
-def windows_filters(signal, P, window, **kwargs):
+def windows_filters(signal, window, **kwargs):
     N = len(signal)
     if window == 'hann':
-        w = np.array([0.5 * (1 - np.cos(2 * np.pi * n / N)) for n in range(N)])
+        w = np.array([0.5 - 0.5 * np.cos(2 * np.pi * n / (N - 1)) for n in range(N)])
     elif window == 'hamming':
         alpha = kwargs['alpha']
         w = np.array([alpha - (1 - alpha) * np.cos(2 * np.pi * n / N) for n in range(N)])
@@ -37,7 +37,6 @@ def windows_filters(signal, P, window, **kwargs):
                 w[omega] = 1
             if omega0 * (1 - alpha) <= abs(omega) <= omega0 * (1 + alpha):
                 w[omega] = 1/2 * (1 - np.sin((np.pi * (abs(omega) - omega0)) / (2 * alpha * omega0)))
-    signal = np.array(signal)[::-1]
-    for i in range(N - P + 1):
-        signal[i] = np.dot(w[i:i + P], signal[i:i + P])
-    return signal[::-1]
+    for i in range(len(signal)):
+        signal[i] *= w[i]
+    return signal
