@@ -3,6 +3,7 @@ import time
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 import numpy as np
+import pylab
 
 from FT import *
 from filters import *
@@ -19,8 +20,8 @@ def time_of_function(function):
 
 
 @time_of_function
-def task_3(type_filter):
-    if type_filter == 'moving_average_1':
+def task_3(type_smoothing):
+    if type_smoothing == 'moving_average_1':
         """
             Фильтр скользящих средних (ключевой элемент - крайний слева)
             N - Ширина окна
@@ -31,7 +32,7 @@ def task_3(type_filter):
             pos_central_elem='left')
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
-    elif type_filter == 'moving_average_2':
+    elif type_smoothing == 'moving_average_2':
         """
             Фильтр скользящих средних (ключевой элемент - посередине)
             N - Ширина окна (нечетное число)
@@ -42,57 +43,42 @@ def task_3(type_filter):
             pos_central_elem='center')
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
-    elif type_filter == 'hann':
+    elif type_smoothing == 'hann':
         """
             Фильтр Низких частот с окном Ханна (Ханнинга)
             signal - Исходный сигнал
             window - тип оконной функции
         """
-        filtered_signal = windows_filters(
+        filtered_signal = windows_smoothing(
             signal=np.copy(amplitudes),
             P=5,
-            window=type_filter)
+            window=type_smoothing)
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
-    elif type_filter == 'hamming':
+    elif type_smoothing == 'hamming':
         """
             Фильтр Низких частот с окном Хэмминга
             signal - Исходный сигнал
             window - тип оконной функции
             alpha - коэффициент для оконной функции Хэмминга
         """
-        filtered_signal = windows_filters(
+        filtered_signal = windows_smoothing(
             signal=np.copy(amplitudes),
-            window=type_filter,
+            window=type_smoothing,
             alpha=0.54)
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
-    elif type_filter == 'blackman':
+    elif type_smoothing == 'blackman':
         """
             Фильтр Низких частот с окном Блэкмана
             signal - Исходный сигнал
             window - тип оконной функции
             alpha - коэффициент для оконной функции Блэкмана
         """
-        filtered_signal = windows_filters(
+        filtered_signal = windows_smoothing(
             signal=np.copy(amplitudes),
-            window=type_filter,
+            window=type_smoothing,
             alpha=0.16)
-        ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
-        ax.legend()
-    elif type_filter == 'raised_cosine':
-        """
-            Полосовой фильтр с косинусоидальным сглаживанием
-            signal - Исходный сигнал
-            omega0 - Частота среза
-            window - тип оконной функции
-            alpha - коэффициент сглаживания
-        """
-        filtered_signal = windows_filters(
-            signal=np.copy(amplitudes),
-            window=type_filter,
-            alpha=0.5,
-            omega0=7)
         ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
         ax.legend()
 
@@ -148,14 +134,10 @@ def task_1():
     """
     omegas = np.arange(1e-2, 70, 1e-2)
 
-    start_time = time.perf_counter_ns()
-
     # spectrum = ft1(times, amplitudes, omegas)
     # restored_signal = ift1(times, spectrum, omegas)
     spectrum = ft2(times, amplitudes, omegas)
     restored_signal = ift2(times, spectrum, omegas)
-
-    print(f"time(ns) == {time.perf_counter_ns() - start_time}")
 
     ax1 = fig.add_subplot(2, 1, 2)
     ax1.plot(omegas / (2 * np.pi), abs(spectrum), 'b', label="Spectrum")
@@ -193,18 +175,38 @@ def get_test_data():
 
 
 if __name__ == "__main__":
+
     # times, amplitudes = get_test_data()
     # times, amplitudes = get_data_from_file('../Task 1/Signals/small_PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
     times, amplitudes = get_data_from_file('../Task 1/Signals/PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
     # times, amplitudes = get_data_from_file('../Task 1/Signals/myVoice.wav')
 
-    fig = plt.figure(figsize=(30, 20))
+    fig = pylab.figure(1)
+    # fig = plt.figure(figsize=(30, 20))
     ax = fig.add_subplot(2, 1, 1)
     ax.plot(times, amplitudes, 'r', label="Signal")
     ax.set_xlabel("Time")
     ax.set_ylabel('Amplitude')
 
+    filtered_signal = low_pass_filter(
+        fig=fig,
+        freq_cutoff=1000,
+        delta_t=times[1] - times[0],
+        amplitudes=amplitudes)
+
+    ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
+    ax.legend()
+
+    # filtered_signal = low_pass_filter(
+    #     fig=fig,
+    #     freq_cutoff=500,
+    #     delta_t=times[1] - times[0],
+    #     amplitudes=amplitudes)
+    #
+    # ax.plot(times, filtered_signal, 'b', label="Filtered Signal", linestyle='-')
+    # ax.legend()
+
     # task_1()
     # task_2('dft')
-    task_3('hann')
+    # task_3('hann')
     plt.show()

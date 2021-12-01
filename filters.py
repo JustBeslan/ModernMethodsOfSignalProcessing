@@ -15,7 +15,7 @@ def moving_average(signal, N, pos_central_elem):
     return signal
 
 
-def windows_filters(signal, window, **kwargs):
+def windows_smoothing(signal, window, **kwargs):
     N = len(signal)
     if window == 'hann':
         w = np.array([0.5 - 0.5 * np.cos(2 * np.pi * n / (N - 1)) for n in range(N)])
@@ -28,15 +28,27 @@ def windows_filters(signal, window, **kwargs):
         a1 = 1 / 2
         a2 = alpha / 2
         w = np.array([a0 - a1 * np.cos(2 * np.pi * n / N) + a2 * np.cos(4 * np.pi * n / N) for n in range(N)])
-    elif window == 'raised_cosine':
-        alpha = kwargs['alpha']
-        omega0 = kwargs['omega0']
-        w = np.zeros((N,))
-        for omega in range(N):
-            if abs(omega) <= omega0 * (1 - alpha):
-                w[omega] = 1
-            if omega0 * (1 - alpha) <= abs(omega) <= omega0 * (1 + alpha):
-                w[omega] = 1/2 * (1 - np.sin((np.pi * (abs(omega) - omega0)) / (2 * alpha * omega0)))
     for i in range(len(signal)):
         signal[i] *= w[i]
     return signal
+
+
+def low_pass_filter(fig, freq_cutoff, delta_t, amplitudes):
+    N = len(amplitudes)
+    delta_omega = 2 * np.pi / (N * delta_t)
+    omegas = np.array([k * delta_omega for k in range(N)])
+    spectrum = np.fft.fft(amplitudes)
+
+    ax1 = fig.add_subplot(2, 1, 2)
+    ax1.plot(omegas, abs(spectrum), 'b', label="Spectrum")
+    ax1.set_xlabel('Freq')
+    ax1.set_ylabel('Amplitude')
+
+    for i in range(len(omegas)):
+        if abs(spectrum[i]) >= freq_cutoff:
+            spectrum[i] = 0
+
+    ax1.plot(omegas, abs(spectrum), 'g', label="Spectrum")
+
+    restored_amplitudes = np.fft.ifft(spectrum)
+    return restored_amplitudes
