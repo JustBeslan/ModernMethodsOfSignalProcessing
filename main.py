@@ -65,7 +65,7 @@ def task_3(type_smoothing):
         ax.legend()
     elif type_smoothing == 'hann':
         """
-            Фильтр Низких частот с окном Ханна (Ханнинга)
+            Сглаживающее окно Ханна (Ханнинга)
             signal - Исходный сигнал
             window - тип оконной функции
         """
@@ -77,7 +77,7 @@ def task_3(type_smoothing):
         ax.legend()
     elif type_smoothing == 'hamming':
         """
-            Фильтр Низких частот с окном Хэмминга
+            Сглаживающее окно Хэмминга
             signal - Исходный сигнал
             window - тип оконной функции
             alpha - коэффициент для оконной функции Хэмминга
@@ -90,7 +90,7 @@ def task_3(type_smoothing):
         ax.legend()
     elif type_smoothing == 'blackman':
         """
-            Фильтр Низких частот с окном Блэкмана
+            Сглаживающее окно Блэкмана
             signal - Исходный сигнал
             window - тип оконной функции
             alpha - коэффициент для оконной функции Блэкмана
@@ -196,9 +196,9 @@ def get_test_data():
 
 if __name__ == "__main__":
     # times, amplitudes = get_test_data()
-    # times, amplitudes = get_data_from_file('../Task 1/Signals/small_PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
-    times, amplitudes = get_data_from_file('../Task 1/Signals/PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
-    # times, amplitudes = get_data_from_file('../Task 1/Signals/myVoice.wav')
+    # times, amplitudes = get_data_from_file('Signals/small_PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
+    times, amplitudes = get_data_from_file('Signals/PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
+    # times, amplitudes = get_data_from_file('Signals/myVoice.wav')
 
     fig = pylab.figure(1)
     ax = fig.add_subplot(2, 1, 1)
