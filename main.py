@@ -19,6 +19,26 @@ def time_of_function(function):
     return wrapped
 
 
+# @time_of_function
+def task_3_2(freq_cutoff, amplitudes, window=None):
+    if window is not None:
+        smoothing_signal = windows_smoothing(
+            signal=amplitudes,
+            window='hann'
+        )
+    else:
+        smoothing_signal = amplitudes
+
+    filtered_signal = low_pass_filter(
+        fig=fig,
+        freq_cutoff=freq_cutoff,
+        delta_t=times[1] - times[0],
+        amplitudes=smoothing_signal)
+
+    ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
+    ax.legend()
+
+
 @time_of_function
 def task_3(type_smoothing):
     if type_smoothing == 'moving_average_1':
@@ -175,38 +195,21 @@ def get_test_data():
 
 
 if __name__ == "__main__":
-
     # times, amplitudes = get_test_data()
     # times, amplitudes = get_data_from_file('../Task 1/Signals/small_PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
     times, amplitudes = get_data_from_file('../Task 1/Signals/PWAS1_to_PWAS4(Ch1)_pulse_0.5mus_Filter3MHz.txt')
     # times, amplitudes = get_data_from_file('../Task 1/Signals/myVoice.wav')
 
     fig = pylab.figure(1)
-    # fig = plt.figure(figsize=(30, 20))
     ax = fig.add_subplot(2, 1, 1)
     ax.plot(times, amplitudes, 'r', label="Signal")
     ax.set_xlabel("Time")
     ax.set_ylabel('Amplitude')
 
-    filtered_signal = low_pass_filter(
-        fig=fig,
-        freq_cutoff=1000,
-        delta_t=times[1] - times[0],
-        amplitudes=amplitudes)
-
-    ax.plot(times, filtered_signal, 'g', label="Filtered Signal", linestyle='-')
-    ax.legend()
-
-    # filtered_signal = low_pass_filter(
-    #     fig=fig,
-    #     freq_cutoff=500,
-    #     delta_t=times[1] - times[0],
-    #     amplitudes=amplitudes)
-    #
-    # ax.plot(times, filtered_signal, 'b', label="Filtered Signal", linestyle='-')
-    # ax.legend()
-
     # task_1()
     # task_2('dft')
     # task_3('hann')
+    task_3_2(
+        freq_cutoff=700,
+        amplitudes=amplitudes)
     plt.show()

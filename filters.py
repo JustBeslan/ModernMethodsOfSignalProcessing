@@ -34,6 +34,7 @@ def windows_smoothing(signal, window, **kwargs):
 
 
 def low_pass_filter(fig, freq_cutoff, delta_t, amplitudes):
+
     N = len(amplitudes)
     delta_omega = 2 * np.pi / (N * delta_t)
     omegas = np.array([k * delta_omega for k in range(N)])
@@ -45,7 +46,8 @@ def low_pass_filter(fig, freq_cutoff, delta_t, amplitudes):
     ax1.set_ylabel('Amplitude')
 
     for i in range(len(omegas)):
-        if abs(spectrum[i]) >= freq_cutoff:
+        # if not (abs(omegas[i]) >= freq_cutoff or abs(omegas[i]) <= 100):
+        if abs(omegas[i]) >= freq_cutoff:
             spectrum[i] = 0
 
     ax1.plot(omegas, abs(spectrum), 'g', label="Spectrum")
